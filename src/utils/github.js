@@ -12,13 +12,12 @@ async function getRepositories(keyword, page) {
   return repoData.data;
 }
 
-async function getIssues(owner, repo, page) {
+async function getIssues(owner, repo) {
   const issueData = await octokit.rest.issues.listForRepo({
-    owner, repo,
-    per_page: 20
+    owner, repo, per_page: 10
   });
 
-  return issueData;
+  return issueData.data;
 }
 
 export { getRepositories, getIssues };

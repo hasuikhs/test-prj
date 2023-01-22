@@ -1,11 +1,16 @@
 import { useEffect, useState } from 'react';
-import { Modal, Button } from 'react-bootstrap';
+import { Modal, Button, ListGroup } from 'react-bootstrap';
 
 import { getIssues } from '../../utils/github';
 
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faLink } from '@fortawesome/free-solid-svg-icons';
+
 function IssueModal({ showModal, setShowModal, repoFullName, repoName, repoOwner }) {
 
-  const [page, setPage] = useState(1);
+  const [curPage, setCurPage] = useState(1);
+  const [totalCount, setTotalCount] = useState(30);
+
   const [issue, setIssue] = useState([]);
 
   const closeModal = () => {
@@ -13,16 +18,16 @@ function IssueModal({ showModal, setShowModal, repoFullName, repoName, repoOwner
   }
 
   const getIssueData = async page => {
-    console.log('this page is', page)
     const issueData = await getIssues(repoOwner, repoName, page);
-    console.log(issueData)
+
+    setIssue(issueData);
   }
 
   useEffect(() => {
     if (showModal) {
-      getIssueData(page);
+      getIssueData(curPage);
     }
-  }, [showModal, page]);
+  }, [showModal, curPage]);
 
   return (
     <Modal show={ showModal } onHide={ closeModal } backdrop="static">
@@ -31,7 +36,19 @@ function IssueModal({ showModal, setShowModal, repoFullName, repoName, repoOwner
       </Modal.Header>
 
       <Modal.Body>
-        내용
+        <ListGroup variant="flush">
+          {
+            !issue
+              ? <></>
+              : (
+                  issue.map(item => (
+                    <ListGroup.Item action onClick={() => window.open(item.html_url)}>
+                      { item.title }
+                    </ListGroup.Item>
+                  ))
+                )
+          }
+        </ListGroup>
       </Modal.Body>
 
       <Modal.Footer>
